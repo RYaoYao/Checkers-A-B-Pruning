@@ -21,22 +21,53 @@ public class Board {
     }
     public void Play(boolean pturn){
         Scanner s = new Scanner(System.in);
-        System.out.print("Select piece you want to move: ");
-                int row = s.nextInt();
-                int col = s.nextInt();
-                System.out.println();
-                System.out.print("Select where to move piece (press any letter to deselect piece): ");
-                int newrow = s.nextInt();
-                int newcol = s.nextInt();
-                if(player.isValidMove(this, row, col, newrow, newcol, true)){
-                    ArrayList<Integer> temp = new ArrayList<Integer>();
-                    temp.add(row); temp.add(col); temp.add(newrow); temp.add(newcol);
-                     player.doAction(this, temp);
-                }
-                aip.doAction(this, aip.getNextMove(this, player.getCheckers().size()));
+        boolean val = false;
+        while(!val){
+            System.out.print("Select piece you want to move: ");
+            int row = s.nextInt();
+            int col = s.nextInt();
+            System.out.println();
+            System.out.print("Select where to move piece (press any letter to deselect piece): ");
+            int newrow = s.nextInt();
+            int newcol = s.nextInt();
+            if(player.isValidMove(this, row, col, newrow, newcol, true)){
+                ArrayList<Integer> temp = new ArrayList<Integer>();
+                val = true;
+                temp.add(row); temp.add(col); temp.add(newrow); temp.add(newcol);
+                 player.doAction(this, temp);
+                 boolean es = true;
+                 while (es){
+                    ArrayList<ArrayList<Integer>> eat = player.checkEat(this, newrow, newcol, true);
+                    if(!eat.isEmpty()){
+                        player.doAction(this, eat.get(0));
+                        newrow = eat.get(0).get(2);
+                        newcol = eat.get(0).get(3);
+                    }else{
+                        es = false;
+                    }
+                 }
+                 
+            }
+        }
+             ArrayList<Integer> move= aip.getNextMove(this, player.getCheckers().size());
+                aip.doAction(this, move);
+
+                int newrow = move.get(2); int newcol = move.get(3);
+                boolean es = true;
+                 while (es){
+                    ArrayList<ArrayList<Integer>> eat = aip.checkEat(this, newrow, newcol, false);
+                    if(!eat.isEmpty()){
+                        aip.doAction(this, eat.get(0));
+                        newrow = eat.get(0).get(2);
+                        newcol = eat.get(0).get(3);
+                    }else{
+                        es = false;
+                    }
+                 }
                 player.showCheckers();
                 System.out.println();
                 aip.showCheckers();
+
         
 
     }
@@ -96,12 +127,14 @@ public class Board {
             nWhPiece = nWhPiece-1;
             player.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.WKing){
+            nWhPiece = nWhPiece-1;
             nWKing = nWKing-1;
             player.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.R){
             nRPiece = nRPiece-1;
             aip.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.RKing){
+            nRPiece = nRPiece-1;
             nRKing = nRKing-1;
             aip.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }

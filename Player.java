@@ -3,7 +3,6 @@ import java.util.*;
 
 public class Player {
     public ArrayList<ArrayList<Integer>> checkers = new ArrayList<ArrayList<Integer>>();
-    public ArrayList<ArrayList<Integer>> testcheckers
     public Player(Board board, boolean isHuman){
             Checker[][] cboard = board.getBoard();
 
@@ -77,7 +76,7 @@ public class Player {
     }
     if(!eatMoves.isEmpty()){
         ArrayList<Integer> eat = eatMoves.get(0);
-        System.out.println(eat.get(0) + " " + eat.get(1) + " " + eat.get(2) + " " + eat.get(3) );
+      
         return eatMoves;
     }
     return regMoves;
@@ -92,7 +91,7 @@ public class Player {
             return false;
         }
         if(isHuman){
-            if(newrow+1 <7 && newcol+1<7){
+
             if(newrow - row == 1){
                 return Math.abs(newcol - col ) == 1;
             }else if(newrow-row == 2){
@@ -100,8 +99,7 @@ public class Player {
             }
             else
             return false;
-        }else 
-        return false;
+     
         }else{
             if(newrow - row == -1){
                 return Math.abs(newcol - col ) == 1;
@@ -169,6 +167,25 @@ public void removeChecker(int row,int col){
             checkers.remove(i);
         }
     }
+}
+public ArrayList<ArrayList<Integer>> checkEat(Board board,int oldrow, int oldcol, boolean isHuman){
+    int[][] eatmovdir=new int[2][2];
+    if (isHuman){
+        eatmovdir = new int[][]{{2,-2}, {2,2}};
+    }
+    else{eatmovdir = new int[][]{{-2,-2}, {-2,2}};}
+    ArrayList<ArrayList<Integer>> eatMoves = new ArrayList<ArrayList<Integer>>();
+    for(int j=0;j<eatmovdir.length;j++){
+    if (isValidMove(board, oldrow, oldcol, oldrow+eatmovdir[j][0], oldcol+eatmovdir[j][1], isHuman)){
+        ArrayList<Integer> temp = new ArrayList<>();
+        temp.add(oldrow);
+        temp.add(oldcol);
+        temp.add(oldrow+eatmovdir[j][0]);
+        temp.add(oldcol+eatmovdir[j][1]);
+        eatMoves.add(temp);
+    }
+}
+    return eatMoves;
 }
 
 public void addChecker(int row,int col){

@@ -64,7 +64,6 @@ public class AIPlayer extends Player{
             if (next> v){
                 v = next;
                 if (deplimit == this.depthlimit){
-                    System.out.println("Here");
                     bestmove.clear();
                     bestmove.add(moves.get(i));
                 }
@@ -95,12 +94,12 @@ public class AIPlayer extends Player{
         }*/
         for(int k =0;k<moves.size();k++){
             double next = 0;
-            Checker captured = doAction(board, moves.get(k));
+            Checker captured = board.getPlayer().doAction(board, moves.get(k));
                 next = max_value(board,alpha,beta,deplimit-1);
             if (next< v){
                 v = next;
             }
-            resetAction(board,moves.get(k), captured);
+            board.getPlayer().resetAction(board,moves.get(k), captured);
             if (v <= alpha){
                 curdep -= 1;
                 return v;
