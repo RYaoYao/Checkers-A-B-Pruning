@@ -15,63 +15,21 @@ public class Board {
         player = new Player(this, true);
          aip = new AIPlayer(this, false);
     }
-
-    public Checker[][] getBoard(){
-        return board;
-    }
-    public void Play(boolean pturn){
-        Scanner s = new Scanner(System.in);
-        boolean val = false;
-        while(!val){
-            System.out.print("Select piece you want to move: ");
-            int row = s.nextInt();
-            int col = s.nextInt();
-            System.out.println();
-            System.out.print("Select where to move piece (press any letter to deselect piece): ");
-            int newrow = s.nextInt();
-            int newcol = s.nextInt();
-            if(player.isValidMove(this, row, col, newrow, newcol, true)){
-                ArrayList<Integer> temp = new ArrayList<Integer>();
-                val = true;
-                temp.add(row); temp.add(col); temp.add(newrow); temp.add(newcol);
-                 player.doAction(this, temp);
-                 boolean es = true;
-                 while (es){
-                    ArrayList<ArrayList<Integer>> eat = player.checkEat(this, newrow, newcol, true);
-                    if(!eat.isEmpty()){
-                        player.doAction(this, eat.get(0));
-                        newrow = eat.get(0).get(2);
-                        newcol = eat.get(0).get(3);
-                    }else{
-                        es = false;
-                    }
-                 }
-                 
+    private void checkPromote(int row, int col){
+        Checker ch = board[row][col];{
+            if(ch == Checker.W){
+                if(row == 7){
+                    nWKing +=1;
+                    board[row][col] = Checker.WKing;
+                }
+            }if(ch == Checker.R){
+                if(row == 0){
+                    nRKing +=1;
+                    board[row][col] = Checker.RKing;
+                }
             }
         }
-             ArrayList<Integer> move= aip.getNextMove(this, player.getCheckers().size());
-                aip.doAction(this, move);
-
-                int newrow = move.get(2); int newcol = move.get(3);
-                boolean es = true;
-                 while (es){
-                    ArrayList<ArrayList<Integer>> eat = aip.checkEat(this, newrow, newcol, false);
-                    if(!eat.isEmpty()){
-                        aip.doAction(this, eat.get(0));
-                        newrow = eat.get(0).get(2);
-                        newcol = eat.get(0).get(3);
-                    }else{
-                        es = false;
-                    }
-                 }
-                player.showCheckers();
-                System.out.println();
-                aip.showCheckers();
-
-        
-
     }
-    //Starting board with 12 pawns and no kings
     private void setBoard(){
         nWhPiece = 12; // Three rows of 4 pieces
         nRPiece = 12;
@@ -100,6 +58,68 @@ public class Board {
             }
         }
     }
+    public Checker[][] getBoard(){
+        return board;
+    }
+    public void Play(boolean pturn){
+        Scanner s = new Scanner(System.in);
+        boolean val = false;
+        while(!val){
+            System.out.print("Select piece you want to move: ");
+            int row = s.nextInt();
+            int col = s.nextInt();
+            System.out.println();
+            System.out.print("Select where to move piece (press any letter to deselect piece): ");
+            int newrow = s.nextInt();
+            int newcol = s.nextInt();
+            if(player.isValidMove(this, row, col, newrow, newcol, true)){
+                ArrayList<Integer> temp = new ArrayList<Integer>();
+                val = true;
+                temp.add(row); temp.add(col); temp.add(newrow); temp.add(newcol);
+                 player.doAction(this, temp);
+                 if(newrow - row == 2){
+                    boolean es = true;
+                 while (es){
+                    ArrayList<ArrayList<Integer>> eat = player.checkEat(this, newrow, newcol, true);
+                    if(!eat.isEmpty()){
+                        player.doAction(this, eat.get(0));
+                        newrow = eat.get(0).get(2);
+                        newcol = eat.get(0).get(3);
+                    }else{
+                        es = false;
+                    }
+                 }
+                 }
+                 checkPromote(newrow, newcol);
+            }
+        }
+             ArrayList<Integer> move= aip.getNextMove(this, player.getCheckers().size());
+                aip.doAction(this, move);
+
+                int newrow = move.get(2); int newcol = move.get(3);
+                if(newrow-move.get(0) == -2){
+                boolean es = true;
+                 while (es){
+                    ArrayList<ArrayList<Integer>> eat = aip.checkEat(this, newrow, newcol, false);
+                    if(!eat.isEmpty()){
+                        aip.doAction(this, eat.get(0));
+                        newrow = eat.get(0).get(2);
+                        newcol = eat.get(0).get(3);
+                    }else{
+                        es = false;
+                    }
+                    
+                 }
+                 checkPromote(newrow, newcol);
+                }
+                 
+                player.showCheckers();
+                System.out.println();
+                aip.showCheckers();
+            }
+
+    //Starting board with 12 pawns and no kings
+    
     // Simmple GUI
     public void VisualizeBoard(){
         System.out.println(" |-------------------------------|");
@@ -112,6 +132,10 @@ public class Board {
                     System.out.print(" R |");
                 if(board[i][j] == Checker.W)
                     System.out.print(" W |");
+                    if(board[i][j] == Checker.WKing)
+                    System.out.print(" WK|");
+                    if(board[i][j] == Checker.RKing)
+                    System.out.print(" WK|");
             }
             System.out.println();
              System.out.println(" |-------------------------------|");

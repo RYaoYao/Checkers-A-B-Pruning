@@ -19,7 +19,7 @@ public class AIPlayer extends Player{
          if(depthlimit<4)
          depthlimit = 4;
         ArrayList<ArrayList<Integer>> move = alphaBetaSearch(board);
-
+        System.out.println(numnodes);
         return move.get(0);
     
     }
@@ -151,7 +151,7 @@ public class AIPlayer extends Player{
         double avgposdiff = avghpos - avgcpos;
 
         double[] features = {pdiff, kdiff, avgposdiff};
-        double[] weights = {100, 10 ,1};
+        double[] weights = {100, 200,1};
         double util = 0;
         for(int k = 0;k<features.length;k++){
             double fw = features[k] * weights[k];

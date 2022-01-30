@@ -31,8 +31,8 @@ public class Player {
         return checkers; 
     }
     public  ArrayList<ArrayList<Integer>> GenMoves(boolean isHuman,Board board){
-        int[][] regmovdir = new int[2][2];
-        int[][] eatmovdir=new int[2][2];
+        int[][] regmovdir;
+        int[][] eatmovdir;
         if (isHuman){
         regmovdir = new int[][]{{1,-1}, {1,1}};
         eatmovdir = new int[][]{{2,-2}, {2,2}};
@@ -53,30 +53,33 @@ public class Player {
        int oldrow = c.get(i).get(0);
         int oldcol = c.get(i).get(1);
         
-        for(int j=0;j<regmovdir.length;j++){
-            if (isValidMove(board, oldrow, oldcol, oldrow+regmovdir[j][0], oldcol+regmovdir[j][1], isHuman)){
-                ArrayList<Integer> temp = new ArrayList<>();
-                temp.add(oldrow);
-                temp.add(oldcol);
-                temp.add(oldrow+regmovdir[j][0]);
-                temp.add(oldcol+regmovdir[j][1]);
-                regMoves.add(temp);
+            if(board.getBoard()[oldrow][oldcol] == Checker.WKing || board.getBoard()[oldrow][oldcol] == Checker.RKing) {
+                    regmovdir = new int[][] {{1,-1}, {1,1},{-1,-1},{-1,1}};
+                    eatmovdir =  new int[][] {{2,-1}, {2,1},{-2,-1},{-2,1}};
             }
-        }
-        for(int j=0;j<eatmovdir.length;j++){
-            if (isValidMove(board, oldrow, oldcol, oldrow+eatmovdir[j][0], oldcol+eatmovdir[j][1], isHuman)){
-                ArrayList<Integer> temp = new ArrayList<>();
-                temp.add(oldrow);
-                temp.add(oldcol);
-                temp.add(oldrow+eatmovdir[j][0]);
-                temp.add(oldcol+eatmovdir[j][1]);
-                eatMoves.add(temp);
+                for(int j=0;j<regmovdir.length;j++){
+                if (isValidMove(board, oldrow, oldcol, oldrow+regmovdir[j][0], oldcol+regmovdir[j][1], isHuman)){
+                    ArrayList<Integer> temp = new ArrayList<>();
+                    temp.add(oldrow);
+                    temp.add(oldcol);
+                    temp.add(oldrow+regmovdir[j][0]);
+                    temp.add(oldcol+regmovdir[j][1]);
+                    regMoves.add(temp);
+                }
             }
-        }
-    }
+            for(int j=0;j<eatmovdir.length;j++){
+                if (isValidMove(board, oldrow, oldcol, oldrow+eatmovdir[j][0], oldcol+eatmovdir[j][1], isHuman)){
+                    ArrayList<Integer> temp = new ArrayList<>();
+                    temp.add(oldrow);
+                    temp.add(oldcol);
+                    temp.add(oldrow+eatmovdir[j][0]);
+                    temp.add(oldcol+eatmovdir[j][1]);
+                    eatMoves.add(temp);
+                }
+            }
+            }
+    
     if(!eatMoves.isEmpty()){
-        ArrayList<Integer> eat = eatMoves.get(0);
-      
         return eatMoves;
     }
     return regMoves;
@@ -91,7 +94,19 @@ public class Player {
             return false;
         }
         if(isHuman){
-
+            if(board.getBoard()[row][col] == Checker.WKing){
+                if(Math.abs(newrow -row) == 1){
+                    return Math.abs(newcol-col) == 1;
+                }else if(Math.abs(newrow-row) == 2){
+                    return ((Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.R)) || (Math.abs(newcol - col) == 2 && board.getBoard()[newrow-1][newcol-1] == Checker.R)
+                    || (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.R)) || (Math.abs(newcol - col) == 2 && board.getBoard()[newrow+1][newcol-1] == Checker.R)
+                    || (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.RKing))|| (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.RKing)) ||
+                    (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.RKing))|| (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.RKing)) );
+                }
+                else
+                return false;
+            }
+         else if(board.getBoard()[row][col] == Checker.W){
             if(newrow - row == 1){
                 return Math.abs(newcol - col ) == 1;
             }else if(newrow-row == 2){
@@ -99,8 +114,21 @@ public class Player {
             }
             else
             return false;
+         } 
      
         }else{
+            if(board.getBoard()[row][col] == Checker.RKing){
+                if(Math.abs(newrow -row) == 1){
+                    return Math.abs(newcol-col) == 1;
+                }else if(Math.abs(newrow-row) == 2){
+                    return ((Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.W)) || (Math.abs(newcol - col) == 2 && board.getBoard()[newrow-1][newcol-1] == Checker.W)
+                    || (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.W)) || (Math.abs(newcol - col) == 2 && board.getBoard()[newrow+1][newcol-1] == Checker.W)
+                    || (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.WKing))|| (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow-1][newcol+1] == Checker.WKing)) ||
+                    (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.WKing))|| (Math.abs(newcol - col) == 2 && (board.getBoard()[newrow+1][newcol+1] == Checker.WKing)) );
+                }
+                else
+                return false;
+            }else if(board.getBoard()[row][col] == Checker.R){
             if(newrow - row == -1){
                 return Math.abs(newcol - col ) == 1;
             }else if(newrow-row == -2){
@@ -109,6 +137,8 @@ public class Player {
             else
             return false;
         }
+        }
+        return true;
 }
 public Checker doAction(Board board, ArrayList<Integer> move){
     int oldrow = move.get(0);
