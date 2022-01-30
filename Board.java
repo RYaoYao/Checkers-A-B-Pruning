@@ -2,7 +2,8 @@ import java.util.*;
 //Create board
 public class Board {
 
-    private Player player, aip;
+    private Player player ;
+    private AIPlayer aip;
     private Checker[][] board;
     public int nWhPiece;
     public int nRPiece;
@@ -11,12 +12,33 @@ public class Board {
 
     public Board(){
         setBoard();
+        player = new Player(this, true);
+         aip = new AIPlayer(this, false);
     }
-    public void setPlayers(Player player,Player AIPlayer){
-        this.player = player; this.aip = AIPlayer;
-    }
+
     public Checker[][] getBoard(){
         return board;
+    }
+    public void Play(boolean pturn){
+        Scanner s = new Scanner(System.in);
+        System.out.print("Select piece you want to move: ");
+                int row = s.nextInt();
+                int col = s.nextInt();
+                System.out.println();
+                System.out.print("Select where to move piece (press any letter to deselect piece): ");
+                int newrow = s.nextInt();
+                int newcol = s.nextInt();
+                if(player.isValidMove(this, row, col, newrow, newcol, true)){
+                    ArrayList<Integer> temp = new ArrayList<Integer>();
+                    temp.add(row); temp.add(col); temp.add(newrow); temp.add(newcol);
+                     player.doAction(this, temp);
+                }
+                aip.doAction(this, aip.getNextMove(this, player.getCheckers().size()));
+                player.showCheckers();
+                System.out.println();
+                aip.showCheckers();
+        
+
     }
     //Starting board with 12 pawns and no kings
     private void setBoard(){
@@ -72,33 +94,33 @@ public class Board {
         board[Math.floorDiv(oldrow+newrow, 2)][Math.floorDiv(oldcol+newcol,2)] = Checker.Empty;
         if(type == Checker.W){
             nWhPiece = nWhPiece-1;
-            player.removeChecker(newrow, newcol);
+            player.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.WKing){
             nWKing = nWKing-1;
-            player.removeChecker(newrow, newcol);
+            player.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.R){
             nRPiece = nRPiece-1;
-            aip.removeChecker(newrow, newcol);
+            aip.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.RKing){
             nRKing = nRKing-1;
-            aip.removeChecker(newrow, newcol);
+            aip.removeChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }
     }
     public void restoreChecker(int oldrow,int oldcol,int newrow,int newcol,Checker type){
+        board[Math.floorDiv(oldrow+newrow, 2)][Math.floorDiv(oldcol+newcol,2)] = type;
         if(type == Checker.W){
             nWhPiece = nWhPiece+1;
-            player.addChecker(oldrow, oldcol);
+            player.addChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.WKing){
             nWKing = nWKing+1;
-            player.addChecker(oldrow, oldcol);
+            player.addChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.R){
             nRPiece = nRPiece+1;
-            aip.addChecker(oldrow, oldcol);
+            aip.addChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }if(type == Checker.RKing){
             nRKing = nRKing+1;
-            aip.addChecker(oldrow, oldcol);
+            aip.addChecker(Math.floorDiv(oldrow+newrow, 2), Math.floorDiv(oldcol+newcol,2));
         }
-        board[Math.floorDiv(oldrow+newrow, 2)][Math.floorDiv(oldcol+newcol,2)] = type;
     }
     public boolean Wcontinue(){
         int[][] dirs ;
@@ -127,5 +149,8 @@ public class Board {
             }
         }
         return false;
+    }
+    public Player getPlayer(){
+        return player;
     }
 }  

@@ -3,6 +3,7 @@ import java.util.*;
 
 public class Player {
     public ArrayList<ArrayList<Integer>> checkers = new ArrayList<ArrayList<Integer>>();
+    public ArrayList<ArrayList<Integer>> testcheckers
     public Player(Board board, boolean isHuman){
             Checker[][] cboard = board.getBoard();
 
@@ -43,11 +44,18 @@ public class Player {
     }
    ArrayList<ArrayList<Integer>> regMoves = new ArrayList<ArrayList<Integer>>();
    ArrayList<ArrayList<Integer>> eatMoves = new ArrayList<ArrayList<Integer>>();
-   for (int i=0;i<checkers.size();i++){
-       int oldrow = checkers.get(i).get(0);
-        int oldcol = checkers.get(i).get(1);
+   ArrayList<ArrayList<Integer>> c ;
+   
+   if(isHuman)
+    c = board.getPlayer().getCheckers();
+    else
+    c = checkers;
+   for (int i=0;i<c.size();i++){
+       int oldrow = c.get(i).get(0);
+        int oldcol = c.get(i).get(1);
+        
         for(int j=0;j<regmovdir.length;j++){
-            if (isValidMove(board, oldrow, oldcol, oldrow+regmovdir[j][0], oldcol+regmovdir[j][1], false)){
+            if (isValidMove(board, oldrow, oldcol, oldrow+regmovdir[j][0], oldcol+regmovdir[j][1], isHuman)){
                 ArrayList<Integer> temp = new ArrayList<>();
                 temp.add(oldrow);
                 temp.add(oldcol);
@@ -57,7 +65,7 @@ public class Player {
             }
         }
         for(int j=0;j<eatmovdir.length;j++){
-            if (isValidMove(board, oldrow, oldcol, oldrow+eatmovdir[j][0], oldcol+eatmovdir[j][1], false)){
+            if (isValidMove(board, oldrow, oldcol, oldrow+eatmovdir[j][0], oldcol+eatmovdir[j][1], isHuman)){
                 ArrayList<Integer> temp = new ArrayList<>();
                 temp.add(oldrow);
                 temp.add(oldcol);
@@ -68,6 +76,8 @@ public class Player {
         }
     }
     if(!eatMoves.isEmpty()){
+        ArrayList<Integer> eat = eatMoves.get(0);
+        System.out.println(eat.get(0) + " " + eat.get(1) + " " + eat.get(2) + " " + eat.get(3) );
         return eatMoves;
     }
     return regMoves;
@@ -82,18 +92,21 @@ public class Player {
             return false;
         }
         if(isHuman){
+            if(newrow+1 <7 && newcol+1<7){
             if(newrow - row == 1){
                 return Math.abs(newcol - col ) == 1;
             }else if(newrow-row == 2){
-                return (newcol - col == 2 && board.getBoard()[newrow+1][newcol+1] == Checker.R) || (newcol - col == -2 && board.getBoard()[newrow+1][newcol+1] == Checker.R);
+                return ((newcol - col == -2 && (board.getBoard()[newrow-1][newcol+1] == Checker.R)) || (newcol - col == 2 && board.getBoard()[newrow-1][newcol-1] == Checker.R));
             }
             else
             return false;
+        }else 
+        return false;
         }else{
             if(newrow - row == -1){
                 return Math.abs(newcol - col ) == 1;
-            }else if(newrow-row == 2){
-                return (newcol - col == -2 && board.getBoard()[newrow+1][newcol+1] == Checker.W) || (newcol - col == 2 && board.getBoard()[newrow+1][newcol+1] == Checker.W);
+            }else if(newrow-row == -2){
+                return (newcol - col == -2 && board.getBoard()[newrow+1][newcol+1] == Checker.W) || (newcol - col == 2 && board.getBoard()[newrow+1][newcol-1] == Checker.W);
             }
             else
             return false;
@@ -109,12 +122,23 @@ public Checker doAction(Board board, ArrayList<Integer> move){
     Checker toMove = cboard[oldrow][oldcol];
     cboard[newrow][newcol] = toMove;
     cboard[oldrow][oldcol] = Checker.Empty;
-
+    board.UpdateBoard(cboard);
+    for (int i=0;i<checkers.size();i++){
+        if(checkers.get(i).get(0) == oldrow && checkers.get(i).get(1) == oldcol){
+            checkers.get(i).set(0, newrow); checkers.get(i).set(1, newcol);
+        }
+    }
     if (Math.abs(oldrow-newrow) == 2){
         captured = cboard[Math.floorDiv(oldrow+newrow, 2)][Math.floorDiv(oldcol+newcol,2)];
             board.removeChecker(oldrow, oldcol, newrow, newcol, captured);
     }
+    
     return captured;
+}
+public void showCheckers(){
+    for (int i =0;i<checkers.size();i++){
+        System.out.println("" + checkers.get(i).get(0) + " " + checkers.get(i).get(1));
+    }
 }
 public Checker resetAction(Board board, ArrayList<Integer> move,Checker captured){
     int oldrow = move.get(0);
@@ -126,11 +150,15 @@ public Checker resetAction(Board board, ArrayList<Integer> move,Checker captured
     cboard[newrow][newcol] = Checker.Empty;
     cboard[oldrow][oldcol] = toMove;
     board.UpdateBoard(cboard);
+    for (int i=0;i<checkers.size();i++){
+        if(checkers.get(i).get(0) == newrow && checkers.get(i).get(1) == newcol){
+            checkers.get(i).set(0, oldrow); checkers.get(i).set(1, oldcol);
+        }
+    }
+    board.UpdateBoard(cboard);
     if (Math.abs(oldrow-newrow) == 2){
-       if (captured == Checker.W || captured == Checker.WKing){
-
-       }
-        
+            board.restoreChecker(oldrow, oldcol, newrow, newcol, captured);
+    
     }
     board.UpdateBoard(cboard);
     return captured;
@@ -142,6 +170,7 @@ public void removeChecker(int row,int col){
         }
     }
 }
+
 public void addChecker(int row,int col){
     ArrayList<Integer> temp = new ArrayList<Integer>();
     temp.add(row);
