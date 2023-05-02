@@ -1,2 +1,2 @@
 # Checkers A-B Pruning
- MCO2- CSINTSY DLSU 
+A project for DLSU AI class. This gme uses A-B pruning to get the next best move. and Java(OOP) to implement the algorithm 
